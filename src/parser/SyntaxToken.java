@@ -1,6 +1,9 @@
 package parser;
 
-public class SyntaxToken {
+import java.util.ArrayList;
+import java.util.List;
+
+public class SyntaxToken implements SyntaxNode {
     private SyntaxKind _kind;
     private int _position;
     private String _text;
@@ -28,4 +31,9 @@ public class SyntaxToken {
     public Object getValue() {
         return _value;
     }
+
+	@Override
+	public List<SyntaxNode> getChildren() {
+		return new ArrayList<SyntaxNode>();
+	}
 }
