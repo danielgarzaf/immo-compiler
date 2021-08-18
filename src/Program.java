@@ -2,6 +2,7 @@ import parser.*;
 
 class Program {
     public static void main(String[] args) {
+        boolean showTree = false;
         while (true) {
             System.out.print("> ");
             String input = System.console().readLine();
@@ -10,8 +11,24 @@ class Program {
                 return;
             }
 
+            if (input.equals("#showTree")) {
+                showTree = !showTree;
+                continue;
+            }
+            if (input.equals("#cls")) {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+                continue;
+            }
+
             SyntaxTree tree = SyntaxTree.parse(input);
-            prettyPrint(tree.getRoot(), "", true);
+            if (showTree) { 
+                String TEXT_YELLOW = "\u001B[33m";
+                System.out.print(TEXT_YELLOW);
+                prettyPrintTree(tree.getRoot(), "", true);
+                String TEXT_RESET = "\u001B[0m";
+                System.out.print(TEXT_RESET);
+            }
 
             if (!(tree.getDiagnostics().size() > 0)) {
                 Evaluator e = new Evaluator(tree.getRoot());
@@ -33,7 +50,7 @@ class Program {
         }
     }
 
-    public static void prettyPrint(SyntaxNode node, String indent, boolean isLast) {
+    public static void prettyPrintTree(SyntaxNode node, String indent, boolean isLast) {
         String marker = isLast ? "└──" : "├──";
 
         System.out.print(indent);
@@ -56,7 +73,7 @@ class Program {
         SyntaxNode lastChild = size > 0 ? node.getChildren().get(size - 1) : null;
 
         for (SyntaxNode child : node.getChildren()) {
-            prettyPrint(child, indent, child == lastChild);
+            prettyPrintTree(child, indent, child == lastChild);
         }
     }
 }

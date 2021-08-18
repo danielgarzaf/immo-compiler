@@ -79,7 +79,7 @@ public class Lexer {
             return new SyntaxToken(SyntaxKind.CloseParenthesisToken, _position++, ")", null);
         }
 
-        _diagnostics.add("ERROR: Bad character input: \'{" + current() + "}\'");
+        _diagnostics.add("ERROR: Bad character input: \'" + current() + "\'");
         return new SyntaxToken(SyntaxKind.BadToken, _position++, _text.substring(_position - 1, _position), null);
     }
 }
