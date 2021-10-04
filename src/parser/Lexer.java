@@ -26,7 +26,7 @@ public class Lexer {
         _position++;
     }
 
-    public SyntaxToken nextToken() {
+    public SyntaxToken lex() {
         if (_position >= _text.length()) {
             return new SyntaxToken(SyntaxKind.EndOfFileToken, _position, "\0", null);
         }
@@ -45,7 +45,7 @@ public class Lexer {
             } catch (Exception e) {
                 _diagnostics.add(String.format("The number %s cannot be represented by the class Integer", text));
             }
-            
+
             return new SyntaxToken(SyntaxKind.NumberToken, start, text, value);
         }
 
@@ -62,20 +62,15 @@ public class Lexer {
 
         if (current() == '+') {
             return new SyntaxToken(SyntaxKind.PlusToken, _position++, "+", null);
-        }
-        else if (current() == '-') {
+        } else if (current() == '-') {
             return new SyntaxToken(SyntaxKind.MinusToken, _position++, "-", null);
-        }
-        else if (current() == '*') {
+        } else if (current() == '*') {
             return new SyntaxToken(SyntaxKind.StarToken, _position++, "*", null);
-        }
-        else if (current() == '/') {
+        } else if (current() == '/') {
             return new SyntaxToken(SyntaxKind.SlashToken, _position++, "/", null);
-        }
-        else if (current() == '(') {
+        } else if (current() == '(') {
             return new SyntaxToken(SyntaxKind.OpenParenthesisToken, _position++, "(", null);
-        }
-        else if (current() == ')') {
+        } else if (current() == ')') {
             return new SyntaxToken(SyntaxKind.CloseParenthesisToken, _position++, ")", null);
         }
 

@@ -13,10 +13,9 @@ public class Parser {
         SyntaxToken token;
         ArrayList<SyntaxToken> tokens = new ArrayList<>();
         do {
-            token = lexer.nextToken();
-            
-            if (token.getKind() != SyntaxKind.WhiteSpaceToken &&
-                    token.getKind() != SyntaxKind.BadToken)
+            token = lexer.lex();
+
+            if (token.getKind() != SyntaxKind.WhiteSpaceToken && token.getKind() != SyntaxKind.BadToken)
                 tokens.add(token);
 
         } while (token.getKind() != SyntaxKind.EndOfFileToken);
@@ -55,52 +54,58 @@ public class Parser {
     }
 
     public SyntaxTree parse() {
-        ExpressionSyntax expression = parseTerm();
-        SyntaxToken endOfFileToken = match(SyntaxKind.EndOfFileToken);
+        ExpressionSyntax expression = parseExpression();
+        SyntaxToken endOfFileToken = matchToken(SyntaxKind.EndOfFileToken);
         return new SyntaxTree(_diagnostics, expression, endOfFileToken);
     }
 
-    public ExpressionSyntax parseTerm() {
-        ExpressionSyntax left = parseFactor();
-
-        while (current().getKind() == SyntaxKind.PlusToken || 
-                current().getKind() == SyntaxKind.MinusToken)
-        {
-            SyntaxToken operatorToken = nextToken();
-            ExpressionSyntax right = parseFactor();
-            left = new BinaryExpressionSyntax(left, operatorToken, right);
-        }
-
-        return left;
-
+    public ExpressionSyntax parseExpression() {
+        return parseExpression(0);
     }
 
-    public ExpressionSyntax parseFactor() {
+    private ExpressionSyntax parseExpression(int parentPrecedence) {
         ExpressionSyntax left = parsePrimaryExpression();
 
-        while (current().getKind() == SyntaxKind.StarToken || 
-                current().getKind() == SyntaxKind.SlashToken) 
-        {
+        while (true) {
+            int precedence = getBinaryOperatorPrecedence(current().getKind());
+            if (precedence == 0 || precedence <= parentPrecedence)
+                break;
+
             SyntaxToken operatorToken = nextToken();
-            ExpressionSyntax right = parsePrimaryExpression();
+            ExpressionSyntax right = parseExpression(precedence);
             left = new BinaryExpressionSyntax(left, operatorToken, right);
         }
 
         return left;
+    }
+
+    private static int getBinaryOperatorPrecedence(SyntaxKind kind) {
+        switch (kind) {
+            case StarToken:
+            case SlashToken:
+                return 2;
+
+            case PlusToken:
+            case MinusToken:
+                return 1;
+
+            default:
+                return 0;
+        }
     }
 
     private ExpressionSyntax parsePrimaryExpression() {
         if (current().getKind() == SyntaxKind.OpenParenthesisToken) {
             SyntaxToken left = nextToken();
-            ExpressionSyntax expression = parseTerm();
-            SyntaxToken right = match(SyntaxKind.CloseParenthesisToken);
+            ExpressionSyntax expression = parseExpression();
+            SyntaxToken right = matchToken(SyntaxKind.CloseParenthesisToken);
             return new ParenthesizedExpressionSyntax(left, expression, right);
         }
-        SyntaxToken numberToken = match(SyntaxKind.NumberToken);
-        return new NumberExpressionSyntax(numberToken);
+        SyntaxToken numberToken = matchToken(SyntaxKind.NumberToken);
+        return new LiteralExpressionSyntax(numberToken);
     }
 
-    private SyntaxToken match(SyntaxKind kind) {
+    private SyntaxToken matchToken(SyntaxKind kind) {
         if (current().getKind() == kind) {
             return nextToken();
         }
@@ -110,7 +115,3 @@ public class Parser {
     }
 
 }
-        
-
-
-
