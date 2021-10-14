@@ -1,5 +1,6 @@
 #!/usr/bin/bash
-rm *.class
-rm parser/*.class
+./clean.sh
 javac Program.java
+echo "compiled: Program.java"
 java Program
+

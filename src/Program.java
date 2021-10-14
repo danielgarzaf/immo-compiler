@@ -11,6 +11,9 @@ class Program {
                 return;
             }
 
+            if (input.equals("#exit")) {
+                break;
+            }
             if (input.equals("#showTree")) {
                 showTree = !showTree;
                 continue;
@@ -22,7 +25,7 @@ class Program {
             }
 
             SyntaxTree tree = SyntaxTree.parse(input);
-            if (showTree) { 
+            if (showTree) {
                 String TEXT_YELLOW = "\u001B[33m";
                 System.out.print(TEXT_YELLOW);
                 prettyPrintTree(tree.getRoot(), "", true);
@@ -34,8 +37,7 @@ class Program {
                 Evaluator e = new Evaluator(tree.getRoot());
                 int result = e.evaluate();
                 System.out.println(result);
-            } 
-            else {
+            } else {
                 String TEXT_RED = "\u001B[31m";
                 System.out.print(TEXT_RED);
 
